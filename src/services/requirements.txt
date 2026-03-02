@@ -1,0 +1,20 @@
+# 情报服务系统依赖
+
+# Web 框架
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+
+# 模板引擎
+jinja2>=3.1.3
+
+# HTTP 客户端（用于 Discord 推送）
+aiohttp>=3.9.0
+
+# 数据验证
+pydantic>=2.5.0
+
+# 异步支持
+python-multipart>=0.0.6
+
+# 可选：邮件发送增强
+# aiosmtplib>=3.0.0

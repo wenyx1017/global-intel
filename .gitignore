@@ -1,0 +1,47 @@
+# 依赖
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+.venv/
+
+# Go
+go.sum
+vendor/
+
+# 数据
+data/raw/*.json
+data/processed/*.json
+data/neo4j/
+data/cache/
+
+# 日志
+logs/*.log
+logs/*.log.*
+
+# 配置（敏感信息）
+config/*.local.yaml
+config/*_secret.yaml
+*.env
+*.env.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# 测试
+test_*.py
+test_*.go
+*_test.json
+
+# 临时文件
+*.tmp
+*.bak
+*.swp

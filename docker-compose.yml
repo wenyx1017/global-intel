@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  neo4j:
+    image: neo4j:5.15.0
+    container_name: global_intel_neo4j
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    volumes:
+      - ./data/neo4j/data:/data
+      - ./data/neo4j/logs:/logs
+    environment:
+      - NEO4J_AUTH=neo4j/global_intel_2026
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+      - NEO4J_dbms_memory_transaction_total_max=0
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:7474"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - global_intel_net
+
+networks:
+  global_intel_net:
+    driver: bridge

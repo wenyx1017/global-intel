@@ -1,0 +1,276 @@
+# 事件类型定义
+# Event Type Definitions for Global Intelligence System
+
+event_types:
+  # 政策发布
+  - name: POLICY_RELEASE
+    label: 政策发布
+    description: 政府或机构发布新政策、法规、规划
+    category: policy
+    severity_levels:
+      - critical: 国家级重大政策
+      - high: 部委级重要政策
+      - medium: 地方或一般政策
+      - low: 常规通知
+    trigger_keywords:
+      - 发布
+      - 实施
+      - 颁布
+      - 出台
+      - 通过
+      - 决定
+      - 通知
+      - 规划
+      - 方案
+      - 意见
+    required_entities:
+      - LAW_POLICY
+    optional_entities:
+      - GOV_ORG
+      - GPE
+    examples:
+      - text: 国务院发布十四五规划
+        entities:
+          - 国务院 (GOV_ORG)
+          - 十四五规划 (LAW_POLICY)
+        severity: critical
+      - text: 央行宣布降准政策
+        entities:
+          - 央行 (GOV_ORG)
+          - 降准政策 (LAW_POLICY)
+        severity: high
+    
+  # 人事变动
+  - name: PERSONNEL_CHANGE
+    label: 人事变动
+    description: 重要人物的职位变动、任命、离职
+    category: personnel
+    severity_levels:
+      - critical: 国家领导人变动
+      - high: 部委/省级领导变动
+      - medium: 司局级变动
+      - low: 一般人事调整
+    trigger_keywords:
+      - 任命
+      - 免去
+      - 调任
+      - 升任
+      - 卸任
+      - 就职
+      - 当选
+      - 提名
+      - 辞职
+      - 退休
+    required_entities:
+      - PERSON
+    optional_entities:
+      - GOV_ORG
+      - ORG
+      - GPE
+    examples:
+      - text: 张三被任命为财政部长
+        entities:
+          - 张三 (PERSON)
+          - 财政部 (GOV_ORG)
+        severity: high
+      - text: 李四当选为公司 CEO
+        entities:
+          - 李四 (PERSON)
+          - 公司 (ORG)
+        severity: medium
+    
+  # 经济数据
+  - name: ECONOMIC_DATA
+    label: 经济数据
+    description: GDP、CPI、失业率等经济数据发布
+    category: economy
+    severity_levels:
+      - critical: 重大数据超预期/不及预期
+      - high: 关键指标显著变化
+      - medium: 常规数据发布
+      - low: 一般数据更新
+    trigger_keywords:
+      - GDP
+      - CPI
+      - PPI
+      - 失业率
+      - 通胀
+      - 增长
+      - 下降
+      - 同比
+      - 环比
+      - 经济
+      - 数据
+      - 公布
+    required_entities:
+      - GPE
+    optional_entities:
+      - GOV_ORG
+      - ORG
+    examples:
+      - text: 中国一季度 GDP 同比增长 5.2%
+        entities:
+          - 中国 (GPE)
+          - GDP (economic indicator)
+        severity: high
+      - text: 美国 CPI 数据超预期
+        entities:
+          - 美国 (GPE)
+          - CPI (economic indicator)
+        severity: high
+    
+  # 国际关系
+  - name: INTERNATIONAL_RELATIONS
+    label: 国际关系
+    description: 国与国之间的外交、贸易、军事互动
+    category: diplomacy
+    severity_levels:
+      - critical: 战争/重大冲突
+      - high: 重大外交事件/制裁
+      - medium: 一般外交活动
+      - low: 常规交流
+    trigger_keywords:
+      - 访问
+      - 会谈
+      - 会晤
+      - 制裁
+      - 协议
+      - 条约
+      - 冲突
+      - 战争
+      - 外交
+      - 贸易
+      - 关税
+    required_entities:
+      - GPE
+    optional_entities:
+      - GOV_ORG
+      - PERSON
+      - ORG
+    examples:
+      - text: 中美举行高层会谈
+        entities:
+          - 中国 (GPE)
+          - 美国 (GPE)
+        severity: high
+      - text: 欧盟对俄罗斯实施制裁
+        entities:
+          - 欧盟 (GPE)
+          - 俄罗斯 (GPE)
+        severity: critical
+    
+  # 自然灾害
+  - name: NATURAL_DISASTER
+    label: 自然灾害
+    description: 地震、洪水、台风等自然灾害
+    category: disaster
+    severity_levels:
+      - critical: 重大灾害/人员伤亡
+      - high: 严重灾害
+      - medium: 一般灾害
+      - low: 轻微灾害
+    trigger_keywords:
+      - 地震
+      - 洪水
+      - 台风
+      - 暴雨
+      - 干旱
+      - 火灾
+      - 火山
+      - 海啸
+      - 灾害
+      - 受灾
+      - 伤亡
+    required_entities:
+      - GPE
+    optional_entities:
+      - EVENT
+      - PERSON
+    examples:
+      - text: 日本发生 7.0 级地震
+        entities:
+          - 日本 (GPE)
+          - 地震 (EVENT)
+        severity: high
+      - text: 河南遭遇特大暴雨
+        entities:
+          - 河南 (GPE)
+          - 暴雨 (EVENT)
+        severity: critical
+
+# 事件检测规则
+detection_rules:
+  # 基于关键词的触发
+  keyword_trigger:
+    enabled: true
+    min_keywords: 1
+    weight: 0.4
+    
+  # 基于实体组合的触发
+  entity_trigger:
+    enabled: true
+    required_entity_combinations:
+      POLICY_RELEASE:
+        - [LAW_POLICY, GOV_ORG]
+        - [LAW_POLICY, GPE]
+      PERSONNEL_CHANGE:
+        - [PERSON, GOV_ORG]
+        - [PERSON, ORG]
+      ECONOMIC_DATA:
+        - [GPE]
+        - [GPE, GOV_ORG]
+      INTERNATIONAL_RELATIONS:
+        - [GPE, GPE]
+        - [GPE, GOV_ORG]
+      NATURAL_DISASTER:
+        - [GPE]
+    weight: 0.4
+    
+  # 基于句法模式的触发
+  pattern_trigger:
+    enabled: true
+    patterns:
+      POLICY_RELEASE:
+        - "{gov}发布{policy}"
+        - "{gov}实施{policy}"
+        - "{policy}出台"
+      PERSONNEL_CHANGE:
+        - "{person}任命为{position}"
+        - "{person}卸任{position}"
+        - "{person}当选{position}"
+      ECONOMIC_DATA:
+        - "{gpe}{indicator}增长{value}"
+        - "{gpe}{indicator}下降{value}"
+      INTERNATIONAL_RELATIONS:
+        - "{gpe1}与{gpe2}{action}"
+        - "{gpe1}对{gpe2}{action}"
+      NATURAL_DISASTER:
+        - "{gpe}发生{disaster}"
+        - "{gpe}遭遇{disaster}"
+    weight: 0.2
+
+# 置信度配置
+confidence:
+  # 基础置信度
+  base_confidence: 0.5
+  # 多关键词匹配的加成
+  multi_keyword_boost: 0.1
+  # 实体匹配的加成
+  entity_match_boost: 0.15
+  # 模式匹配的加成
+  pattern_match_boost: 0.15
+  # 最小置信度阈值
+  min_threshold: 0.5
+  # 高置信度阈值
+  high_threshold: 0.8
+
+# 事件关联规则
+correlation_rules:
+  # 时间窗口内的相关事件
+  time_window_hours: 24
+  # 地理位置相关
+  location_correlation: true
+  # 实体相关
+  entity_correlation: true
+  # 主题相关
+  topic_correlation: true

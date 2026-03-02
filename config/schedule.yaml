@@ -1,0 +1,184 @@
+# 调度配置 - 详细任务定义
+# Schedule Configuration - Detailed Task Definitions
+
+# ==================== 数据采集层 ====================
+collectors:
+  # RSS 订阅采集
+  rss_feed:
+    cron: "*/5 * * * *"
+    enabled: true
+    timeout: 30
+    retry: 3
+    sources:
+      - whitehouse
+      - imf
+      - sec
+      - reuters
+      - caixin
+  
+  # 官方 API 采集
+  official_api:
+    cron: "*/15 * * * *"
+    enabled: true
+    timeout: 60
+    retry: 3
+    apis:
+      - name: "pbc_api"
+        endpoint: "http://www.pbc.gov.cn/"
+        rate_limit: 10  # 每分钟请求数
+      
+      - name: "stats_api"
+        endpoint: "http://data.stats.gov.cn/"
+        rate_limit: 5
+  
+  # 网页爬虫
+  web_crawler:
+    cron: "*/30 * * * *"
+    enabled: true
+    timeout: 120
+    retry: 2
+    concurrency: 5  # 并发爬取数
+    user_agent: "Mozilla/5.0 (compatible; GlobalIntelBot/0.1)"
+    respect_robots: true
+    sites:
+      - gov.cn
+      - bloomberg.com
+      - reuters.com
+  
+  # 信源评价
+  source_evaluator:
+    cron: "0 */6 * * *"
+    enabled: true
+    evaluate_all: true
+    auto_disable: true  # 自动禁用 C 级信源
+
+# ==================== 数据处理层 ====================
+processors:
+  # 数据清洗
+  data_cleaner:
+    cron: "*/30 * * * *"
+    enabled: true
+    batch_size: 100
+    remove_duplicates: true
+    normalize_encoding: true
+  
+  # 实体识别
+  entity_extractor:
+    cron: "0 * * * *"
+    enabled: true
+    model: "spacy"
+    languages:
+      - zh
+      - en
+    entity_types:
+      - PERSON
+      - ORG
+      - GPE
+      - DATE
+      - MONEY
+      - PERCENT
+  
+  # 关系抽取
+  relation_extractor:
+    cron: "0 * * * *"
+    enabled: true
+    model: "transformers"
+    relation_types:
+      - employment
+      - ownership
+      - partnership
+      - location
+      - transaction
+  
+  # 事件检测
+  event_detector:
+    cron: "0 * * * *"
+    enabled: true
+    rules_based: true
+    ml_based: false
+    event_types:
+      - policy_change
+      - economic_data
+      - corporate_action
+      - geopolitical
+
+# ==================== 应用服务层 ====================
+services:
+  # 知识图谱构建
+  knowledge_graph:
+    cron: "0 */6 * * *"
+    enabled: true
+    batch_size: 500
+    merge_entities: true
+    validate_relations: true
+  
+  # 图谱验证（大模型）
+  graph_validator:
+    cron: "0 */12 * * *"
+    enabled: true
+    use_llm: true
+    sample_size: 100  # 每次验证的样本数
+    auto_fix: false
+  
+  # 报告生成（大模型）
+  report_generator:
+    cron: "0 8 * * *"
+    enabled: true
+    use_llm: true
+    report_types:
+      - daily
+      - weekly
+    recipients:
+      - email
+      - discord
+  
+  # LLM 分析
+  llm_analyzer:
+    cron: "0 * * * *"
+    enabled: true
+    analysis_types:
+      - sentiment
+      - trend
+      - risk
+    max_tokens: 4000
+    temperature: 0.3
+
+# ==================== 维护任务 ====================
+maintenance:
+  # 数据库清理
+  db_cleanup:
+    cron: "0 3 * * *"
+    enabled: true
+    retain_days: 90
+    vacuum: true
+  
+  # 缓存清理
+  cache_cleanup:
+    cron: "0 4 * * *"
+    enabled: true
+    clear_expired: true
+  
+  # 日志轮转
+  log_rotation:
+    cron: "0 0 * * *"
+    enabled: true
+    compress: true
+    retain_days: 30
+  
+  # 备份
+  backup:
+    cron: "0 2 * * 0"
+    enabled: true
+    destination: "./backups/"
+    retain_count: 4
+
+# ==================== 通知配置 ====================
+notifications:
+  on_task_failure: true
+  on_low_disk_space: true
+  on_api_rate_limit: true
+  channels:
+    - type: "log"
+      level: "ERROR"
+    # - type: "email"
+    # - type: "discord"

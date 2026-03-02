@@ -1,0 +1,23 @@
+{
+  "report_id": "daily_20260302",
+  "report_type": "daily",
+  "generated_at": "2026-03-02T09:16:15.127299",
+  "period_start": "2026-03-02 00:00:00",
+  "period_end": "2026-03-02 23:59:59",
+  "title": "每日情报报告 - 2026年03月02日",
+  "summary": "本报告包含1个章节。",
+  "sections": [
+    {
+      "title": "今日概览",
+      "content": "2026年03月02日暂无特别数据。",
+      "priority": "low",
+      "tags": [
+        "概览"
+      ]
+    }
+  ],
+  "metadata": {
+    "date": "2026-03-02",
+    "total_sections": 1
+  }
+}

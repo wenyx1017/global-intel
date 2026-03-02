@@ -1,0 +1,101 @@
+# 大模型配置文件
+# 用于情报分析系统的大模型接口配置
+
+# LLM 提供商配置
+llm:
+  # 提供商类型：openai, claude, qwen
+  provider: openai
+  
+  # 模型名称
+  model: gpt-4o-mini
+  
+  # API 密钥（建议通过环境变量设置）
+  api_key: ${OPENAI_API_KEY}
+  
+  # 自定义 API 端点（可选，用于兼容服务或本地部署）
+  # base_url: https://api.openai.com/v1
+  
+  # 最大生成 token 数
+  max_tokens: 4096
+  
+  # 温度参数（0-1，越高越随机）
+  temperature: 0.7
+  
+  # 请求超时（秒）
+  timeout: 60
+
+# 频率限制配置
+rate_limit:
+  # 最小调用间隔（秒）- 防止过度调用
+  min_interval: 3600  # 1 小时
+  
+  # 每日最大调用次数
+  max_daily_calls: 24
+  
+  # 每日预算上限（美元）
+  daily_budget: 10.0
+
+# 预算配置
+budget:
+  # 每日预算上限（美元）
+  daily_limit: 10.0
+  
+  # 每月预算上限（美元）
+  monthly_limit: 300.0
+  
+  # 单次调用预算上限（美元）
+  per_call_limit: 1.0
+
+# 任务配置
+tasks:
+  # 图谱验证
+  graph_verification:
+    enabled: true
+    # 置信度阈值（低于此值需要人工审核）
+    confidence_threshold: 0.7
+    # 自动修复建议
+    auto_suggest_fixes: true
+  
+  # 关联验证
+  relation_verification:
+    enabled: true
+    confidence_threshold: 0.7
+  
+  # 报告生成
+  report_generation:
+    enabled: true
+    # 报告保存路径
+    output_dir: ./reports
+    # 自动发送（需要配置通知渠道）
+    auto_send: false
+
+# 日志配置
+logging:
+  # 日志级别：DEBUG, INFO, WARNING, ERROR
+  level: INFO
+  
+  # 日志文件路径
+  file: ./logs/analyzer.log
+  
+  # 是否输出到控制台
+  console: true
+
+# 状态存储配置
+state:
+  # 状态文件路径
+  file: ./analyzer_state.json
+  
+  # 自动保存间隔（秒）
+  save_interval: 60
+
+# 备用模型配置（当主模型不可用时）
+fallback:
+  enabled: true
+  providers:
+    - provider: qwen
+      model: qwen-plus
+      api_key: ${QWEN_API_KEY}
+      base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+    - provider: claude
+      model: claude-3-5-sonnet-20241022
+      api_key: ${ANTHROPIC_API_KEY}

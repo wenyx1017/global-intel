@@ -1,0 +1,315 @@
+# Global Intel Data Sources Configuration
+# Last updated: 2026-03-02
+
+# =============================================================================
+# RSS 订阅源 (RSS Feeds)
+# =============================================================================
+rss:
+  # 中国信源
+  - name: "中国政府网"
+    url: "http://www.gov.cn/pushinfo/vine/tg.xml"
+    enabled: true
+    interval: 30
+
+  - name: "新华社"
+    url: "http://www.xinhuanet.com/politics/leader_xw.xml"
+    enabled: true
+    interval: 30
+
+  - name: "中国人民银行"
+    url: "http://www.pbc.gov.cn/other/rss.xml"
+    enabled: true
+    interval: 60
+
+  - name: "国家统计局"
+    url: "http://www.stats.gov.cn/rss.xml"
+    enabled: true
+    interval: 60
+
+  - name: "中国证监会"
+    url: "http://www.csrc.gov.cn/csrc/xwbl/rss.xml"
+    enabled: true
+    interval: 60
+
+  # 全球信源
+  - name: "白宫"
+    url: "https://www.whitehouse.gov/briefing-room/statements-releases/feed/"
+    enabled: true
+    interval: 30
+
+  - name: "IMF"
+    url: "https://www.imf.org/en/News/Feeds/All-News.xml"
+    enabled: true
+    interval: 60
+
+  - name: "世界银行"
+    url: "https://www.worldbank.org/en/news/all/rss.xml"
+    enabled: true
+    interval: 60
+
+  - name: "美国 SEC"
+    url: "https://www.sec.gov/news/pressreleases/rss.xml"
+    enabled: true
+    interval: 60
+
+  - name: "路透社"
+    url: "https://www.reutersagency.com/feed/"
+    enabled: true
+    interval: 30
+
+# =============================================================================
+# 官方 API 接入 (Official APIs)
+# =============================================================================
+api:
+  # 中国信源
+  - name: "中国政府网 API"
+    base_url: "http://www.gov.cn/zhengce/content"
+    enabled: false  # 需要确认具体 API 端点
+    interval: 60
+    auth_type: none
+    endpoints:
+      - name: "政策文件"
+        path: "/node_5461.json"
+        method: GET
+        description: "获取最新政策文件"
+
+  - name: "中国人民银行 API"
+    base_url: "http://www.pbc.gov.cn"
+    enabled: false  # 需要确认具体 API 端点
+    interval: 60
+    auth_type: none
+    endpoints:
+      - name: "金融数据"
+        path: "/goutongjiaoliu/113456/113469/index.html"
+        method: GET
+        description: "获取金融统计数据"
+
+  - name: "国家统计局 API"
+    base_url: "http://data.stats.gov.cn"
+    enabled: false  # 需要确认具体 API 端点
+    interval: 120
+    auth_type: none
+    endpoints:
+      - name: "经济数据"
+        path: "/easyquery.htm?cn=C01"
+        method: GET
+        description: "获取宏观经济数据"
+
+  - name: "中国证监会 API"
+    base_url: "http://www.csrc.gov.cn"
+    enabled: false  # 需要确认具体 API 端点
+    interval: 60
+    auth_type: none
+    endpoints:
+      - name: "监管信息"
+        path: "/csrc/xwbl/index.shtml"
+        method: GET
+        description: "获取监管动态"
+
+  # 全球信源
+  - name: "白宫 API"
+    base_url: "https://api.whitehouse.gov/v1"
+    enabled: false  # 需要 API key
+    interval: 30
+    auth_type: api_key
+    auth_config:
+      api_key: "${WHITEHOUSE_API_KEY}"
+    endpoints:
+      - name: "新闻稿"
+        path: "/press-releases"
+        method: GET
+        description: "获取白宫新闻稿"
+
+  - name: "IMF API"
+    base_url: "https://api.imf.org"
+    enabled: false  # 需要确认 API 端点
+    interval: 60
+    auth_type: none
+    endpoints:
+      - name: "经济展望"
+        path: "/weo/data"
+        method: GET
+        description: "获取世界经济展望数据"
+
+  - name: "世界银行 API"
+    base_url: "https://api.worldbank.org/v2"
+    enabled: true
+    interval: 60
+    auth_type: none
+    endpoints:
+      - name: "指标数据"
+        path: "/country/all/indicator/SP.POP.TOTL"
+        method: GET
+        description: "获取世界发展指标"
+
+  - name: "美国 SEC API"
+    base_url: "https://data.sec.gov"
+    enabled: true
+    interval: 60
+    auth_type: none
+    endpoints:
+      - name: "公司文件"
+        path: "/submissions"
+        method: GET
+        description: "获取 SEC 备案文件"
+
+  - name: "路透社 API"
+    base_url: "https://api.reuters.com"
+    enabled: false  # 需要 API key
+    interval: 30
+    auth_type: api_key
+    auth_config:
+      api_key: "${REUTERS_API_KEY}"
+    endpoints:
+      - name: "新闻"
+        path: "/news"
+        method: GET
+        description: "获取路透新闻"
+
+# =============================================================================
+# 网页爬虫 (Web Crawlers)
+# =============================================================================
+crawler:
+  # 中国信源
+  - name: "中国政府网"
+    base_url: "http://www.gov.cn"
+    enabled: true
+    interval: 60
+    delay: 5
+    user_agent: "Mozilla/5.0 (compatible; GlobalIntel Crawler)"
+    rules:
+      - name: "要闻"
+        url_pattern: "/yaowen/index.shtml"
+        selector: ".list_news"
+        title_sel: "a"
+        link_sel: "a"
+        date_sel: ".date"
+        content_sel: ".content"
+        description: "抓取中国政府网要闻"
+
+  - name: "新华社"
+    base_url: "http://www.xinhuanet.com"
+    enabled: true
+    interval: 30
+    delay: 5
+    rules:
+      - name: "时政新闻"
+        url_pattern: "/politics/"
+        selector: ".news-list"
+        title_sel: "h3 a"
+        link_sel: "h3 a"
+        date_sel: ".time"
+        description: "抓取新华社时政新闻"
+
+  - name: "中国人民银行"
+    base_url: "http://www.pbc.gov.cn"
+    enabled: true
+    interval: 60
+    delay: 10
+    rules:
+      - name: "新闻动态"
+        url_pattern: "/goutongjiaoliu/113456/113469/index.html"
+        selector: ".newslist"
+        title_sel: "li a"
+        link_sel: "li a"
+        date_sel: ".date"
+        description: "抓取央行新闻动态"
+
+  - name: "国家统计局"
+    base_url: "http://www.stats.gov.cn"
+    enabled: true
+    interval: 60
+    delay: 10
+    rules:
+      - name: "统计数据"
+        url_pattern: "/tjsj/zxfb/"
+        selector: ".list-content"
+        title_sel: "a"
+        link_sel: "a"
+        date_sel: ".date"
+        description: "抓取统计局数据发布"
+
+  - name: "中国证监会"
+    base_url: "http://www.csrc.gov.cn"
+    enabled: true
+    interval: 60
+    delay: 10
+    rules:
+      - name: "新闻发布"
+        url_pattern: "/csrc/xwbl/index.shtml"
+        selector: ".newlist"
+        title_sel: "a"
+        link_sel: "a"
+        date_sel: ".date"
+        description: "抓取证监会新闻发布"
+
+  # 全球信源
+  - name: "白宫"
+    base_url: "https://www.whitehouse.gov"
+    enabled: true
+    interval: 30
+    delay: 5
+    rules:
+      - name: "新闻稿"
+        url_pattern: "/briefing-room/statements-releases/"
+        selector: ".post"
+        title_sel: "h2 a"
+        link_sel: "h2 a"
+        date_sel: ".date"
+        description: "抓取白宫新闻稿"
+
+  - name: "IMF"
+    base_url: "https://www.imf.org"
+    enabled: true
+    interval: 60
+    delay: 5
+    rules:
+      - name: "新闻"
+        url_pattern: "/en/News"
+        selector: ".news-item"
+        title_sel: "h3 a"
+        link_sel: "h3 a"
+        date_sel: ".date"
+        description: "抓取 IMF 新闻"
+
+  - name: "世界银行"
+    base_url: "https://www.worldbank.org"
+    enabled: true
+    interval: 60
+    delay: 5
+    rules:
+      - name: "新闻"
+        url_pattern: "/en/news"
+        selector: ".news-result"
+        title_sel: "h4 a"
+        link_sel: "h4 a"
+        date_sel: ".date"
+        description: "抓取世界银行新闻"
+
+  - name: "美国 SEC"
+    base_url: "https://www.sec.gov"
+    enabled: true
+    interval: 60
+    delay: 10
+    rules:
+      - name: "新闻稿"
+        url_pattern: "/news/pressreleases"
+        selector: ".news-item"
+        title_sel: "h3 a"
+        link_sel: "h3 a"
+        date_sel: ".date"
+        description: "抓取 SEC 新闻稿"
+
+  - name: "路透社"
+    base_url: "https://www.reuters.com"
+    enabled: true
+    interval: 30
+    delay: 5
+    rules:
+      - name: "头条新闻"
+        url_pattern: "/"
+        selector: ".story-card"
+        title_sel: "h3"
+        link_sel: "a"
+        date_sel: "time"
+        description: "抓取路透头条新闻"

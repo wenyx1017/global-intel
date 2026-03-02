@@ -1,0 +1,229 @@
+# 全球情报系统 - 主配置文件
+# Global Intelligence System - Main Configuration
+
+version: "0.1"
+created: "2026-03-02"
+
+# ==================== 系统配置 ====================
+system:
+  name: "global-intel"
+  environment: "development"  # development | staging | production
+  debug: true
+  log_level: "INFO"  # DEBUG | INFO | WARNING | ERROR | CRITICAL
+
+# ==================== 数据存储配置 ====================
+storage:
+  database:
+    type: "sqlite"  # sqlite | postgresql
+    path: "./data/global_intel.db"
+    # postgresql:
+    #   host: "localhost"
+    #   port: 5432
+    #   database: "global_intel"
+    #   user: "intel_user"
+    #   password: "${DB_PASSWORD}"
+  
+  graph:
+    type: "neo4j"  # neo4j | networkx
+    uri: "bolt://localhost:7687"
+    user: "neo4j"
+    password: "${NEO4J_PASSWORD}"
+  
+  cache:
+    type: "redis"  # redis | memory
+    host: "localhost"
+    port: 6379
+    db: 0
+    ttl: 3600  # 默认缓存 1 小时
+
+# ==================== 大模型配置 ====================
+llm:
+  provider: "dashscope"  # openai | dashscope | claude
+  model: "qwen3.5-plus"
+  api_key: "${LLM_API_KEY}"
+  base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  
+  # 调用限制
+  constraints:
+    min_interval: 3600    # 最小间隔（秒）
+    max_calls_per_day: 24 # 每日最大调用
+    budget_per_day: 10.0  # 每日预算（美元）
+  
+  # 超时配置
+  timeout:
+    connect: 10
+    read: 60
+
+# ==================== 信源配置 ====================
+sources:
+  # 第一手信源（S 级）
+  primary:
+    - name: "白宫"
+      url: "https://www.whitehouse.gov/briefings-statements/"
+      type: "rss"
+      category: "politics"
+      country: "US"
+      language: "en"
+      update_interval: 300  # 5 分钟
+    
+    - name: "中国政府网"
+      url: "http://www.gov.cn/guowuyuan/gb/content.htm"
+      type: "crawler"
+      category: "politics"
+      country: "CN"
+      language: "zh"
+      update_interval: 600  # 10 分钟
+    
+    - name: "IMF"
+      url: "https://www.imf.org/en/News"
+      type: "rss"
+      category: "economy"
+      country: "INTL"
+      language: "en"
+      update_interval: 900  # 15 分钟
+    
+    - name: "中国人民银行"
+      url: "http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/index.html"
+      type: "crawler"
+      category: "finance"
+      country: "CN"
+      language: "zh"
+      update_interval: 900  # 15 分钟
+    
+    - name: "SEC"
+      url: "https://www.sec.gov/news/pressreleases"
+      type: "rss"
+      category: "finance"
+      country: "US"
+      language: "en"
+      update_interval: 900  # 15 分钟
+  
+  # 第二手信源（A 级）
+  secondary:
+    - name: "Reuters"
+      url: "https://www.reuters.com/"
+      type: "rss"
+      category: "news"
+      country: "INTL"
+      language: "en"
+      update_interval: 1800  # 30 分钟
+    
+    - name: " Bloomberg"
+      url: "https://www.bloomberg.com/"
+      type: "crawler"
+      category: "finance"
+      country: "INTL"
+      language: "en"
+      update_interval: 1800  # 30 分钟
+    
+    - name: "财新"
+      url: "https://www.caixin.com/"
+      type: "rss"
+      category: "finance"
+      country: "CN"
+      language: "zh"
+      update_interval: 1800  # 30 分钟
+
+# ==================== 调度配置 ====================
+schedule:
+  # 数据采集层（高频）
+  collectors:
+    rss_feed: "*/5 * * * *"        # 每 5 分钟
+    official_api: "*/15 * * * *"   # 每 15 分钟
+    web_crawler: "*/30 * * * *"    # 每 30 分钟
+    source_evaluator: "0 */6 * * *" # 每 6 小时
+  
+  # 数据处理层（中频）
+  processors:
+    data_cleaner: "*/30 * * * *"   # 每 30 分钟
+    entity_extractor: "0 * * * *"  # 每小时
+    relation_extractor: "0 * * * *" # 每小时
+    event_detector: "0 * * * *"    # 每小时
+  
+  # 应用服务层（低频）
+  services:
+    knowledge_graph: "0 */6 * * *"  # 每 6 小时
+    graph_validator: "0 */12 * * *" # 每 12 小时
+    report_generator: "0 8 * * *"   # 每天 8 点
+    llm_analyzer: "0 * * * *"       # 每小时
+
+# ==================== 信源评价配置 ====================
+evaluation:
+  dimensions:
+    accuracy: 0.30    # 准确性权重
+    authenticity: 0.25 # 真实性权重
+    objectivity: 0.25  # 客观性权重
+    importance: 0.20   # 重大性权重
+  
+  thresholds:
+    S: 90  # S 级：90-100 分
+    A: 80  # A 级：80-89 分
+    B: 70  # B 级：70-79 分
+    C: 0   # C 级：<70 分（淘汰）
+  
+  # 评价周期
+  cycle: "0 0 * * *"  # 每天凌晨执行
+
+# ==================== 日志配置 ====================
+logging:
+  level: "INFO"
+  format: "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+  date_format: "%Y-%m-%d %H:%M:%S"
+  
+  # 文件日志
+  file:
+    enabled: true
+    path: "./logs/global_intel.log"
+    max_size: 10485760  # 10MB
+    backup_count: 5
+    rotation: "daily"
+  
+  # 控制台日志
+  console:
+    enabled: true
+    colorize: true
+  
+  # 结构化日志（JSON 格式）
+  structured:
+    enabled: false
+    path: "./logs/structured.json"
+
+# ==================== 通知配置 ====================
+notification:
+  enabled: false
+  channels:
+    - type: "email"
+      smtp_server: "smtp.example.com"
+      port: 587
+      user: "${EMAIL_USER}"
+      password: "${EMAIL_PASSWORD}"
+      recipients:
+        - "admin@example.com"
+    
+    - type: "discord"
+      webhook_url: "${DISCORD_WEBHOOK}"
+    
+    - type: "wechat"
+      corp_id: "${WECHAT_CORP_ID}"
+      agent_id: "${WECHAT_AGENT_ID}"
+      secret: "${WECHAT_SECRET}"
+
+# ==================== API 服务配置 ====================
+api:
+  enabled: true
+  host: "0.0.0.0"
+  port: 8080
+  debug: false
+  
+  # 认证
+  auth:
+    enabled: true
+    api_key_header: "X-API-Key"
+    api_keys:
+      - "${API_KEY_1}"
+  
+  # 限流
+  rate_limit:
+    enabled: true
+    requests_per_minute: 60
+    requests_per_hour: 1000

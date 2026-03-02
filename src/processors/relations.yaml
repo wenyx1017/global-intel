@@ -1,0 +1,205 @@
+# 关系类型定义
+# Relation Type Definitions for Global Intelligence System
+
+relation_types:
+  # 隶属于
+  - name: AFFILIATED_WITH
+    label: 隶属于
+    description: 表示实体之间的从属、归属关系
+    direction: directed
+    domain:
+      - PERSON
+      - ORG
+      - GOV_ORG
+    range:
+      - ORG
+      - GOV_ORG
+      - GPE
+    examples:
+      - head: 张三
+        tail: 阿里巴巴
+        relation: 隶属于
+        context: 阿里巴巴 CEO 张三
+      - head: 美联储
+        tail: 美国
+        relation: 隶属于
+        context: 美国联邦储备系统
+    
+  # 位于
+  - name: LOCATED_IN
+    label: 位于
+    description: 表示实体的地理位置关系
+    direction: directed
+    domain:
+      - ORG
+      - GOV_ORG
+      - PERSON
+      - EVENT
+    range:
+      - GPE
+    examples:
+      - head: 阿里巴巴
+        tail: 中国
+        relation: 位于
+        context: 总部位于杭州的阿里巴巴
+      - head: 达沃斯论坛
+        tail: 瑞士
+        relation: 位于
+        context: 在瑞士举办的达沃斯论坛
+    
+  # 发布/实施
+  - name: PUBLISHED_BY
+    label: 发布/实施
+    description: 表示政策、法规的发布主体
+    direction: directed
+    domain:
+      - LAW_POLICY
+    range:
+      - GOV_ORG
+      - GPE
+    examples:
+      - head: 十四五规划
+        tail: 中国国务院
+        relation: 发布/实施
+        context: 国务院发布十四五规划
+      - head: 外商投资法
+        tail: 全国人大
+        relation: 发布/实施
+        context: 全国人大通过外商投资法
+    
+  # 影响/被影响
+  - name: AFFECTS
+    label: 影响/被影响
+    description: 表示实体之间的影响关系
+    direction: directed
+    domain:
+      - LAW_POLICY
+      - EVENT
+      - ORG
+      - PERSON
+    range:
+      - ORG
+      - GPE
+      - PERSON
+    examples:
+      - head: 碳中和政策
+        tail: 能源行业
+        relation: 影响
+        context: 碳中和政策影响能源行业
+      - head: 中美贸易战
+        tail: 出口企业
+        relation: 影响
+        context: 贸易战影响出口企业
+    
+  # 合作/对抗
+  - name: COOPERATES_WITH
+    label: 合作/对抗
+    description: 表示实体之间的合作或对抗关系
+    direction: undirected
+    subtypes:
+      - COOPERATES
+      - CONFRONTS
+    domain:
+      - GPE
+      - ORG
+      - GOV_ORG
+    range:
+      - GPE
+      - ORG
+      - GOV_ORG
+    examples:
+      - head: 中国
+        tail: 欧盟
+        relation: 合作
+        context: 中欧达成气候合作协议
+        subtype: COOPERATES
+      - head: 美国
+        tail: 中国
+        relation: 对抗
+        context: 中美科技竞争加剧
+        subtype: CONFRONTS
+
+# 关系抽取规则
+extraction_rules:
+  # 隶属于 - 关键词模式
+  AFFILIATED_WITH:
+    patterns:
+      - "{head}的{tail}"
+      - "{tail}{head}"
+      - "{head}任职于{tail}"
+      - "{head}所属{tail}"
+      - "{tail}的{head}"
+    keywords:
+      - 的
+      - 任职于
+      - 所属
+      - 旗下
+      - 部门
+      - 机构
+    
+  # 位于 - 关键词模式
+  LOCATED_IN:
+    patterns:
+      - "{head}位于{tail}"
+      - "{head}总部{tail}"
+      - "{tail}{head}"
+      - "{head}在{tail}"
+    keywords:
+      - 位于
+      - 总部
+      - 设在
+      - 地处
+      - 在
+    
+  # 发布/实施 - 关键词模式
+  PUBLISHED_BY:
+    patterns:
+      - "{tail}发布{head}"
+      - "{tail}实施{head}"
+      - "{head}由{tail}发布"
+      - "{tail}通过{head}"
+    keywords:
+      - 发布
+      - 实施
+      - 通过
+      - 颁布
+      - 出台
+    
+  # 影响/被影响 - 关键词模式
+  AFFECTS:
+    patterns:
+      - "{head}影响{tail}"
+      - "{head}对{tail}的影响"
+      - "{tail}受{head}影响"
+    keywords:
+      - 影响
+      - 冲击
+      - 波及
+      - 涉及
+      - 关乎
+    
+  # 合作/对抗 - 关键词模式
+  COOPERATES_WITH:
+    patterns:
+      - "{head}与{tail}合作"
+      - "{head}和{tail}联合"
+      - "{head}对抗{tail}"
+      - "{head}与{tail}竞争"
+    keywords:
+      - 合作
+      - 联合
+      - 携手
+      - 对抗
+      - 竞争
+      - 冲突
+
+# 置信度配置
+confidence:
+  # 模式匹配的基础置信度
+  pattern_match: 0.8
+  # 关键词匹配的基础置信度
+  keyword_match: 0.6
+  # 上下文增强的置信度加成
+  context_boost: 0.1
+  # 最小置信度阈值
+  min_threshold: 0.5

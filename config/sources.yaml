@@ -1,0 +1,309 @@
+# 信源配置 - 详细信息
+# Source Configuration - Detailed Information
+
+# ==================== 第一手信源（S 级） ====================
+primary_sources:
+  # 政治类
+  - id: whitehouse
+    name: "白宫"
+    url: "https://www.whitehouse.gov/briefings-statements/"
+    type: "rss"
+    category: "politics"
+    country: "US"
+    language: "en"
+    reliability_score: 95
+    update_interval: 300  # 5 分钟
+    active: true
+  
+  - id: gov_cn
+    name: "中国政府网"
+    url: "http://www.gov.cn/guowuyuan/gb/content.htm"
+    type: "crawler"
+    category: "politics"
+    country: "CN"
+    language: "zh"
+    reliability_score: 95
+    update_interval: 600  # 10 分钟
+    active: true
+    crawler_config:
+      selector: ".content_detail"
+      extract_links: true
+  
+  # 经济类
+  - id: imf
+    name: "IMF"
+    url: "https://www.imf.org/en/News"
+    type: "rss"
+    category: "economy"
+    country: "INTL"
+    language: "en"
+    reliability_score: 92
+    update_interval: 900  # 15 分钟
+    active: true
+  
+  - id: worldbank
+    name: "世界银行"
+    url: "https://www.worldbank.org/en/news"
+    type: "rss"
+    category: "economy"
+    country: "INTL"
+    language: "en"
+    reliability_score: 92
+    update_interval: 900
+    active: true
+  
+  # 金融类
+  - id: pbc
+    name: "中国人民银行"
+    url: "http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/index.html"
+    type: "crawler"
+    category: "finance"
+    country: "CN"
+    language: "zh"
+    reliability_score: 95
+    update_interval: 900
+    active: true
+  
+  - id: sec
+    name: "SEC"
+    url: "https://www.sec.gov/news/pressreleases"
+    type: "rss"
+    category: "finance"
+    country: "US"
+    language: "en"
+    reliability_score: 93
+    update_interval: 900
+    active: true
+  
+  - id: csrc
+    name: "中国证监会"
+    url: "http://www.csrc.gov.cn/csrc/home/index.shtml"
+    type: "crawler"
+    category: "finance"
+    country: "CN"
+    language: "zh"
+    reliability_score: 93
+    update_interval: 900
+    active: true
+  
+  # 能源类
+  - id: iea
+    name: "IEA"
+    url: "https://www.iea.org/news"
+    type: "rss"
+    category: "energy"
+    country: "INTL"
+    language: "en"
+    reliability_score: 90
+    update_interval: 1800
+    active: true
+  
+  - id: nea
+    name: "国家能源局"
+    url: "http://www.nea.gov.cn/"
+    type: "crawler"
+    category: "energy"
+    country: "CN"
+    language: "zh"
+    reliability_score: 90
+    update_interval: 1800
+    active: true
+  
+  # 科技类
+  - id: arxiv
+    name: "arXiv"
+    url: "https://arxiv.org/list/cs.AI/recent"
+    type: "rss"
+    category: "technology"
+    country: "INTL"
+    language: "en"
+    reliability_score: 88
+    update_interval: 3600
+    active: true
+  
+  - id: most
+    name: "科技部"
+    url: "http://www.most.gov.cn/"
+    type: "crawler"
+    category: "technology"
+    country: "CN"
+    language: "zh"
+    reliability_score: 90
+    update_interval: 1800
+    active: true
+
+# ==================== 第二手信源（A 级） ====================
+secondary_sources:
+  # 财经媒体
+  - id: reuters
+    name: "Reuters"
+    url: "https://www.reuters.com/"
+    type: "rss"
+    category: "news"
+    country: "INTL"
+    language: "en"
+    reliability_score: 85
+    update_interval: 1800
+    active: true
+    requires_verification: true
+  
+  - id: bloomberg
+    name: "Bloomberg"
+    url: "https://www.bloomberg.com/"
+    type: "crawler"
+    category: "finance"
+    country: "INTL"
+    language: "en"
+    reliability_score: 85
+    update_interval: 1800
+    active: true
+    requires_verification: true
+  
+  - id: caixin
+    name: "财新"
+    url: "https://www.caixin.com/"
+    type: "rss"
+    category: "finance"
+    country: "CN"
+    language: "zh"
+    reliability_score: 82
+    update_interval: 1800
+    active: true
+    requires_verification: true
+  
+  - id: wsj
+    name: "Wall Street Journal"
+    url: "https://www.wsj.com/"
+    type: "rss"
+    category: "finance"
+    country: "US"
+    language: "en"
+    reliability_score: 83
+    update_interval: 1800
+    active: true
+    requires_verification: true
+  
+  - id: ft
+    name: "Financial Times"
+    url: "https://www.ft.com/"
+    type: "rss"
+    category: "finance"
+    country: "UK"
+    language: "en"
+    reliability_score: 84
+    update_interval: 1800
+    active: true
+    requires_verification: true
+  
+  # 科技媒体
+  - id: techcrunch
+    name: "TechCrunch"
+    url: "https://techcrunch.com/"
+    type: "rss"
+    category: "technology"
+    country: "US"
+    language: "en"
+    reliability_score: 78
+    update_interval: 3600
+    active: true
+    requires_verification: true
+  
+  - id: 36kr
+    name: "36 氪"
+    url: "https://36kr.com/"
+    type: "rss"
+    category: "technology"
+    country: "CN"
+    language: "zh"
+    reliability_score: 75
+    update_interval: 3600
+    active: true
+    requires_verification: true
+  
+  # 综合媒体
+  - id: xinhuanet
+    name: "新华网"
+    url: "http://www.xinhuanet.com/"
+    type: "rss"
+    category: "news"
+    country: "CN"
+    language: "zh"
+    reliability_score: 85
+    update_interval: 1800
+    active: true
+  
+  - id: bbc
+    name: "BBC"
+    url: "https://www.bbc.com/news"
+    type: "rss"
+    category: "news"
+    country: "UK"
+    language: "en"
+    reliability_score: 80
+    update_interval: 1800
+    active: true
+    requires_verification: true
+
+# ==================== 信源分类统计 ====================
+categories:
+  politics:
+    count: 2
+    update_frequency: "5-10 分钟"
+  
+  economy:
+    count: 2
+    update_frequency: "15 分钟"
+  
+  finance:
+    count: 7
+    update_frequency: "15-30 分钟"
+  
+  energy:
+    count: 2
+    update_frequency: "30 分钟"
+  
+  technology:
+    count: 4
+    update_frequency: "30-60 分钟"
+  
+  news:
+    count: 3
+    update_frequency: "30 分钟"
+
+# ==================== 信源评价规则 ====================
+evaluation_rules:
+  # 准确性评价
+  accuracy:
+    method: "cross_validation"
+    min_sources: 3
+    weight: 0.30
+  
+  # 真实性评价
+  authenticity:
+    checks:
+      - domain_verification
+      - author_verification
+      - citation_check
+    weight: 0.25
+  
+  # 客观性评价
+  objectivity:
+    method: "sentiment_analysis"
+    bias_detection: true
+    weight: 0.25
+  
+  # 重大性评价
+  importance:
+    metrics:
+      - citation_count
+      - social_shares
+      - follow_up_reports
+    weight: 0.20
+
+# ==================== 信源管理 ====================
+management:
+  auto_add: true
+  auto_remove: true
+  min_score_threshold: 70
+  evaluation_frequency: "0 0 * * *"  # 每天凌晨
+  notification_on_change: true

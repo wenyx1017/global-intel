@@ -1,0 +1,21 @@
+{
+  "test001": {
+    "user_id": "test001",
+    "username": "测试用户",
+    "email": "test@example.com",
+    "discord_id": "123456789",
+    "created_at": "2026-03-02T09:15:58.384300",
+    "updated_at": "2026-03-02T09:15:58.384331",
+    "is_active": true,
+    "preferences": {
+      "report_types": [
+        "daily"
+      ],
+      "delivery_channel": "discord",
+      "delivery_time": "09:00",
+      "timezone": "Asia/Shanghai",
+      "language": "zh-CN",
+      "filters": {}
+    }
+  }
+}
