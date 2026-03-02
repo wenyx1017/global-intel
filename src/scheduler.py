@@ -31,12 +31,13 @@ class SchedulerTask:
     """调度任务类"""
     
     def __init__(self, name: str, cron_expr: str, handler: Callable, 
-                 args: tuple = (), kwargs: dict = None):
+                 args: tuple = (), kwargs: dict = None, timeout: int = 300):
         self.name = name
         self.cron_expr = cron_expr
         self.handler = handler
         self.args = args
         self.kwargs = kwargs or {}
+        self.timeout = timeout  # 任务超时（秒）
         self.enabled = True
         self.last_run = None
         self.next_run = None
@@ -67,15 +68,40 @@ class SchedulerTask:
         return datetime.now() >= self.next_run
     
     def execute(self):
-        """执行任务"""
+        """执行任务（支持超时）"""
+        import threading
+        
+        def target():
+            """任务执行目标"""
+            try:
+                self.handler(*self.args, **self.kwargs)
+                return True
+            except Exception as e:
+                logger.error(f"任务 {self.name} 执行异常：{e}")
+                raise
+        
         try:
-            logger.info(f"执行任务：{self.name}")
-            self.handler(*self.args, **self.kwargs)
+            logger.info(f"执行任务：{self.name} (timeout: {self.timeout}s)")
+            
+            # 创建线程
+            thread = threading.Thread(target=target)
+            thread.daemon = True
+            thread.start()
+            
+            # 等待完成（带超时）
+            thread.join(timeout=self.timeout)
+            
+            if thread.is_alive():
+                logger.error(f"任务 {self.name} 执行超时（{self.timeout}秒）")
+                self.fail_count += 1
+                return
+            
             self.last_run = datetime.now()
             self.run_count += 1
             self.fail_count = 0
             self._update_next_run()
             logger.info(f"任务 {self.name} 执行成功")
+            
         except Exception as e:
             logger.error(f"任务 {self.name} 执行失败：{e}")
             self.fail_count += 1
@@ -147,6 +173,23 @@ class Scheduler:
             for name, cron_expr in services.items():
                 self.add_task(f"service_{name}", cron_expr, self._default_handler)
             
+            # 加载专项任务（硬编码）
+            special_tasks = schedule_config.get('special_tasks', {})
+            for name, cron_expr in special_tasks.items():
+                try:
+                    from src.tasks import TASKS
+                    if name in TASKS:
+                        task_config = TASKS[name]
+                        self.add_task(
+                            f"special_{name}",
+                            cron_expr,
+                            task_config['handler'],
+                            timeout=task_config.get('timeout', 300)
+                        )
+                        logger.info(f"加载硬编码任务：{name} ({task_config['description']})")
+                except ImportError as e:
+                    logger.warning(f"导入任务模块失败：{name} - {e}")
+            
             logger.info(f"从配置加载了 {len(self.tasks)} 个调度任务")
             
         except Exception as e:
@@ -158,12 +201,12 @@ class Scheduler:
         logger.info(f"执行默认处理器：{args}, {kwargs}")
     
     def add_task(self, name: str, cron_expr: str, handler: Callable, 
-                 args: tuple = (), kwargs: dict = None):
+                 args: tuple = (), kwargs: dict = None, timeout: int = 300):
         """添加调度任务"""
         with self._lock:
-            task = SchedulerTask(name, cron_expr, handler, args, kwargs)
+            task = SchedulerTask(name, cron_expr, handler, args, kwargs, timeout)
             self.tasks[name] = task
-            logger.info(f"添加任务：{name} (cron: {cron_expr})")
+            logger.info(f"添加任务：{name} (cron: {cron_expr}, timeout: {timeout}s)")
     
     def remove_task(self, name: str):
         """移除调度任务"""

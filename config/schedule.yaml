@@ -1,23 +1,32 @@
 # 调度配置
 schedule:
+  # ==================== 数据采集层 ====================
   collectors:
     rss_feed: "*/5 * * * *"
     official_api: "*/15 * * * *"
     web_crawler: "*/30 * * * *"
     source_evaluator: "0 */6 * * *"
   
+  # ==================== 数据处理层 ====================
   processors:
     data_cleaner: "*/30 * * * *"
     entity_extractor: "0 * * * *"
     relation_extractor: "0 * * * *"
     event_detector: "0 * * * *"
   
+  # ==================== 应用服务层 ====================
   services:
     knowledge_graph: "0 */6 * * *"
     graph_validator: "0 */12 * * *"
     report_generator: "0 8 * * *"
     llm_analyzer: "0 * * * *"
   
+  # ==================== 专项任务 ====================
+  special_tasks:
+    # 公告爬取（硬编码任务）
+    announcement_crawler: "0 9 * * *"
+  
+  # ==================== 系统维护 ====================
   maintenance:
     db_cleanup: "0 3 * * *"
     cache_cleanup: "0 4 * * *"
